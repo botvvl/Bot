@@ -32,7 +32,7 @@ type TransactionSenderAndConfirmationWaiterArgs = {
   serializedTransaction: Buffer;
   blockhashWithExpiryBlockHeight: BlockhashWithExpiryBlockHeight;
   // optional send options to control preflight behavior
-  sendOptions?: { skipPreflight?: boolean };
+  sendOptions?: { skipPreflight?: boolean, highPriority?: boolean };
 };
 
 // default send options (preserve previous behavior)
@@ -46,20 +46,39 @@ export async function transactionSenderAndConfirmationWaiter({
   blockhashWithExpiryBlockHeight,
   sendOptions,
 }: TransactionSenderAndConfirmationWaiterArgs): Promise<VersionedTransactionResponse | null> {
-  // Default to live trades enabled unless explicitly set to 'false'
-  const liveTrades = process.env.LIVE_TRADES === undefined ? true : (String(process.env.LIVE_TRADES).toLowerCase() === 'true');
-  console.log('[transactionSenderAndConfirmationWaiter] liveTrades flag at entry =', liveTrades);
-  if (!liveTrades) {
-    console.warn('[transactionSenderAndConfirmationWaiter] DRY-RUN: LIVE_TRADES!=true. Skipping sendRawTransaction to avoid burning fees.');
+  // Default to DRY-RUN unless explicitly enabled. Require CONFIRM_SEND==='yes' as extra guard.
+  const liveTrades = String(process.env.LIVE_TRADES || '').toLowerCase() === 'true';
+  const confirmSend = String(process.env.CONFIRM_SEND || '').toLowerCase() === 'yes';
+  console.log('[transactionSenderAndConfirmationWaiter] liveTrades=', liveTrades, 'confirmSend=', confirmSend);
+  if (!liveTrades || !confirmSend) {
+    console.warn('[transactionSenderAndConfirmationWaiter] DRY-RUN: live sends are disabled. Set LIVE_TRADES=true and CONFIRM_SEND=yes to enable live sends.');
+    // Return null to indicate DRY-RUN (caller should treat as simulated)
     return null;
   }
   const options = sendOptions || DEFAULT_SEND_OPTIONS;
+  const highPriority = (options && (options as any).highPriority) || String(process.env.HIGH_PRIORITY || '').toLowerCase() === 'true';
   let txid: string | undefined;
   try {
-    txid = await connection.sendRawTransaction(
-      serializedTransaction,
-      options
-    );
+    // If highPriority requested, attempt preferred fast RPC first (env or pool)
+    if (highPriority) {
+      const prefer = process.env.HIGH_PRIORITY_RPC_URL || process.env.HELIUS_FAST_RPC_URL_2 || (rpcPool.getHealthyCandidates && rpcPool.getHealthyCandidates()[0]);
+      if (prefer) {
+        try {
+          const fastConn = rpcPool.getRpcConnection(prefer);
+          txid = await fastConn.sendRawTransaction(serializedTransaction, options);
+          connection = fastConn; // switch to fast connection for confirmation
+        } catch (fastErr) {
+          // fall back to primary connection below
+          console.warn('[transactionSenderAndConfirmationWaiter] highPriority fast send failed:', (fastErr as any)?.message ?? fastErr);
+        }
+      }
+    }
+    if (!txid) {
+      txid = await connection.sendRawTransaction(
+        serializedTransaction,
+        options
+      );
+    }
   } catch (firstErr: any) {
     // Print diagnostics for first error
     try {
@@ -191,19 +210,25 @@ export async function transactionSenderAndConfirmationWaiter({
 
   const controller = new AbortController();
   const abortSignal = controller.signal;
-
+  // Aggressive resender for high-priority sends (fires immediately and then frequently).
   const abortableResender = async () => {
+    const aggressive = highPriority;
+    let attempt = 0;
     while (true) {
-      await wait(2_000);
-      if (abortSignal.aborted) return;
       try {
-        await connection.sendRawTransaction(
-          serializedTransaction,
-          options
-        );
+        if (abortSignal.aborted) return;
+        // On first iteration, send immediately (no wait) to improve chances of being second in-order.
+        if (attempt === 0) {
+          await connection.sendRawTransaction(serializedTransaction, options).catch(()=>null);
+        } else {
+          await wait(aggressive ? 150 : 2000);
+          if (abortSignal.aborted) return;
+          await connection.sendRawTransaction(serializedTransaction, options).catch(()=>null);
+        }
       } catch (e) {
         console.warn(`Failed to resend transaction: ${e}`);
       }
+      attempt++;
     }
   };
 
@@ -230,7 +255,7 @@ export async function transactionSenderAndConfirmationWaiter({
       new Promise(async (resolve) => {
         // in case ws socket died
         while (!abortSignal.aborted) {
-          await wait(2_000);
+          await wait(highPriority ? 200 : 2_000);
           const tx = await connection.getSignatureStatus(txid, {
             searchTransactionHistory: false,
           });
@@ -276,14 +301,31 @@ export async function transactionSenderAndConfirmationWaiter({
 
 // Manual verbose sender: broadcast raw tx and poll signature status with detailed logs
 export async function manualSendRawTransactionVerbose({ connection, serializedTransaction, sendOptions }: { connection: Connection; serializedTransaction: Buffer; sendOptions?: { skipPreflight?: boolean }; }) {
-  const liveTrades = process.env.LIVE_TRADES === undefined ? true : (String(process.env.LIVE_TRADES).toLowerCase() === 'true');
-  if (!liveTrades) {
-    console.warn('[manualSendRawTransactionVerbose] DRY-RUN: LIVE_TRADES!=true. Skipping manual send.');
+  const liveTrades = String(process.env.LIVE_TRADES || '').toLowerCase() === 'true';
+  const confirmSend = String(process.env.CONFIRM_SEND || '').toLowerCase() === 'yes';
+  if (!liveTrades || !confirmSend) {
+    console.warn('[manualSendRawTransactionVerbose] DRY-RUN: live sends disabled. Skipping manual send.');
     return { success: false, reason: 'dry-run' };
   }
   try {
     const options = sendOptions || { skipPreflight: true };
-    console.log('[manualSendRawTransactionVerbose] broadcasting raw transaction with options:', options);
+    const highPriority = String(process.env.HIGH_PRIORITY || '').toLowerCase() === 'true' || (options && (options as any).highPriority);
+    console.log('[manualSendRawTransactionVerbose] broadcasting raw transaction with options:', options, 'highPriority=', highPriority);
+    // prefer fast RPC if requested
+    if (highPriority) {
+      const prefer = process.env.HIGH_PRIORITY_RPC_URL || process.env.HELIUS_FAST_RPC_URL_2 || (rpcPool.getHealthyCandidates && rpcPool.getHealthyCandidates()[0]);
+      if (prefer) {
+        try {
+          const fastConn = rpcPool.getRpcConnection(prefer);
+          const txid = await fastConn.sendRawTransaction(serializedTransaction, options);
+          console.log('[manualSendRawTransactionVerbose] sent via fastConn:', prefer, txid);
+          connection = fastConn;
+          // continue to confirm below
+        } catch (e) {
+          console.warn('[manualSendRawTransactionVerbose] fast send failed, falling back:', (e as any)?.message ?? e);
+        }
+      }
+    }
     const txid = await connection.sendRawTransaction(serializedTransaction, options);
     console.log('[manualSendRawTransactionVerbose] sendRawTransaction returned signature:', txid);
     // Poll status a few times

@@ -42,15 +42,8 @@ let _tokenUtils = null;
 try{ _tokenUtils = require('../src/utils/tokenUtils'); }catch(e){}
 
 const PROGRAMS = [
-  'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc',
-  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
-  'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr',
-  'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s',
-  'pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA',
-  'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4',
-  'CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK',
   '9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp',
-  'PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu'
+  '6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P'
 ];
 
 // RULES: per-program allowed transaction kinds. This map controls which transaction kinds
@@ -61,19 +54,9 @@ const PROGRAMS = [
 const RULES = {
   // Make default inclusive: capture explicit initializes and swap events to avoid missing real launches
   default: { allow: ['initialize','pool_creation','swap'] },
-  'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s': { allow: ['initialize'] },
-  // Token program: allow initialize so we detect mint initializations routed through Tokenkeg
-  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA': { allow: ['initialize'] },
-  'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4': { allow: ['pool_creation','swap'] },
-  'pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA': { allow: ['pool_creation','swap'] },
-  'CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK': { allow: ['pool_creation','swap'] },
-  'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc': { allow: ['swap'] },
-  'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr': { allow: ['swap'] },
-  '11111111111111111111111111111111': { allow: ['swap'] },
-  '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin': { allow: ['pool_creation','initialize','swap'] },
-  // If a program had an empty allow list previously we now include initialize to avoid skipping real mint events
-  '9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp': { allow: ['initialize'] },
-  'PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu': { allow: ['swap'] }
+  // Keep rules minimal for the selected programs
+  '9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp': { allow: ['initialize','pool_creation','swap'] },
+  '6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P': { allow: ['initialize','pool_creation','swap'] }
 };
 
 // Kinds that should always be processed to avoid dropping real mint launches.

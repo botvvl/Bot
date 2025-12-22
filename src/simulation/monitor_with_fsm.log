@@ -1,0 +1,26 @@
+>> Starting in-process listener + program monitor (60s)
+Sequential 10s per-program listener starting (daemon mode)
+[whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc] listening (10s)
+["27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4","cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij"]
+["28KR3goEditLnzBZShRk2H7xvgzc176EoFwMogjdfSkn","FZN7QZ8ZUUAxMPfxYEYkH3cXUASzH8EqA6B4tyCL8f1j"]
+["CSdPS6Y4KSzufK4qpUZEEyhahkbnH5KApMuheEyH9nUe","5314GTpDziP2ZdaANnt5KJEABGXy5Nn5Kyc3SFPYpump"]
+["Dtt1mTZeaHvnLHQzFR4v7o7UrkUXTgx98PFg1B6Yc6Qw"]
+["9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump","Dz9mQ9NzkBcCsuGPFJ3r1bS4wgqKMHBPiVuniW8Mbonk"]
+["mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So"]
+[whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc] done
+[TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA] listening (10s)
+[TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA] done
+[MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr] listening (10s)
+["4daQJJBzDZubnphZgfR1i44skANeXAi41jhsF9Qt39Ed"]
+{"time":"2025-12-22T02:17:05.830Z","program":"MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr","signature":"CoUxKySnoXUnutvSaRDq6SNN3v8v5Nb9XF9sLdpcKk4XCZSB78nyevcdjTQ9TPVYfYBhYYoawLJCoZwQi2mdGms","kind":"swap","freshMints":["4daQJJBzDZubnphZgfR1i44skANeXAi41jhsF9Qt39Ed"],"sampleLogs":["Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [1]","Program log: CreateIdempotent","Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 4338 of 800000 compute units","Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success","Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [1]","Program log: CreateIdempotent"]}
+[PREDICTION] {"program":"MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr","prediction":"swap","confidence":0.4,"reason":"most recent kind fallback","sample":["swap"],"lastSeen":1766369825831,"ageMs":95}
+["8J2svwJHBBUYY7XrWVZ6CpYkQH5LgHW248JZ3hfwdCF9"]
+{"time":"2025-12-22T02:17:06.215Z","program":"MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr","signature":"X5jsFTrqXySLxH2yZgw5kLuMmF5BN1PrvNAL2teQ81qufnh5iZQajTEtwRFjwiL46gp2xJ7XNQQxotfVu9HsNnK","kind":"swap","freshMints":["8J2svwJHBBUYY7XrWVZ6CpYkQH5LgHW248JZ3hfwdCF9"],"sampleLogs":["Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [1]","Program log: CreateIdempotent","Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 4338 of 800000 compute units","Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success","Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [1]","Program log: CreateIdempotent"]}
+[PREDICTION] {"program":"MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr","prediction":"swap","confidence":0.6,"reason":"multiple swaps observed","sample":["swap","swap"],"lastSeen":1766369826215,"ageMs":88}
+["FvuWPtAwu28AkkT8GYMiTBAjqwjiG65r1x6KuY54VNtL"]
+["47ezAzwMJMj8HbrVnz7VLBLTuG5N6cykyM1kKbn7Vbh8"]
+["85XHRyychwHoD2JXDvqREbA9KbrLwipRKdJK9c8SY7aK"]
+{"time":"2025-12-22T02:17:11.285Z","program":"MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr","signature":"4S2VjUemXUhwMFJo2GyExenGHY5BRxzihYwZsy5ajgRoYozmAbnWJkmVw2Vy86hLiwJHoRibbgyHwYeWE6Qx8xMQ","kind":"swap","freshMints":["85XHRyychwHoD2JXDvqREbA9KbrLwipRKdJK9c8SY7aK"],"sampleLogs":["Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [1]","Program log: CreateIdempotent","Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [2]","Program log: Instruction: GetAccountDataSize","Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1569 of 997595 compute units","Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA="]}
+COLLECTED_FINAL ["4daQJJBzDZubnphZgfR1i44skANeXAi41jhsF9Qt39Ed","8J2svwJHBBUYY7XrWVZ6CpYkQH5LgHW248JZ3hfwdCF9","85XHRyychwHoD2JXDvqREbA9KbrLwipRKdJK9c8SY7aK"]
+{"collected":["4daQJJBzDZubnphZgfR1i44skANeXAi41jhsF9Qt39Ed","8J2svwJHBBUYY7XrWVZ6CpYkQH5LgHW248JZ3hfwdCF9","85XHRyychwHoD2JXDvqREbA9KbrLwipRKdJK9c8SY7aK"],"time":"2025-12-22T02:17:11.285Z"}
+Exiting because COLLECT_MAX reached

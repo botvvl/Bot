@@ -57,6 +57,19 @@ export const private_connection = rpcPool.getRpcConnection(PRIVATE_RPC_ENDPOINT 
 
 export const getRpcPool = () => rpcPool;
 
+// Probe and watcher tuning defaults
+export const PROBE_TTL_MS = Number(process.env.PROBE_TTL_MS || 10000);
+export const PROBE_RETRY = Number(process.env.PROBE_RETRY || 1);
+export const PROBE_BACKOFF_BASE_MS = Number(process.env.PROBE_BACKOFF_BASE_MS || 10);
+
+export const READY_SCORE_THRESHOLD = Number(process.env.READY_SCORE_THRESHOLD || 0.80);
+export const FINAL_REPROBE_PER_PROBE_MS = Number(process.env.FINAL_REPROBE_PER_PROBE_MS || 12);
+export const FINAL_REPROBE_JUPITER_MS = Number(process.env.FINAL_REPROBE_JUPITER_MS || 18);
+export const FIND_TIMEOUT_MS = Number(process.env.FIND_TIMEOUT_MS || 120000);
+
+// Notification defaults
+export const NOTIFY_ADMIN_ID = process.env.NOTIFY_ADMIN_ID || (process.env.ADMIN_IDS ? (process.env.ADMIN_IDS.split(',')[0] || null) : null);
+
 // Keep default export minimal (not required) but helpful for CommonJS consumers
 export default {
 	RPC_URL,
