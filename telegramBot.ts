@@ -170,14 +170,14 @@ try{
             const built = tk.buildTokenMessage(tkn, botUsername, pairAddress, uid);
             if(built && built.msg){
               const fullMsg = prefix + built.msg;
-              await bot.telegram.sendMessage(chatId, fullMsg, { parse_mode: 'HTML', disable_web_page_preview: false, reply_markup: { inline_keyboard: built.inlineKeyboard } });
+              await bot.telegram.sendMessage(chatId, fullMsg, { parse_mode: 'HTML', disable_web_page_preview: false, reply_markup: { inline_keyboard: built.inlineKeyboard } } as any);
             }
           }catch(e){ console.error('sniper->bot send token error', e); }
         }
       }catch(e){ }
     });
   }
-}catch(e){ console.error('Failed to attach sniper notifier to bot', e && e.message || e); }
+}catch(e){ console.error('Failed to attach sniper notifier to bot', (e as any)?.message || e); }
 
 // Sent-token hash helpers used by wsListener.ts — simple file-backed store
 import cryptoHash from 'crypto';
@@ -1088,6 +1088,15 @@ bot.on('text', async (ctx, next) => {
     console.log(`[⚙️ Strategy] User: ${String(ctx.from?.id)}`);
     userStrategyStates[userId] = { step: 0, values: {} };
     await ctx.reply(t('strategy.setup_intro', userId));
+    // If no STRATEGY_FIELDS are defined (we only want trade-level settings),
+    // jump directly to trade settings phase and prompt for buy amount.
+    if (!STRATEGY_FIELDS || STRATEGY_FIELDS.length === 0) {
+      userStrategyStates[userId].phase = 'tradeSettings';
+      userStrategyStates[userId].step = 0;
+      userStrategyStates[userId].tradeSettings = {};
+      await ctx.reply('⚙️ Trade settings:\nPlease enter the buy amount per trade (SOL):');
+      return;
+    }
     const field = STRATEGY_FIELDS[0];
     return await ctx.reply(t('strategy.field_prompt', userId, { label: field.label, optional: field.optional ? ' (optional)' : '' }));
   }
@@ -1770,15 +1779,11 @@ bot.on('text', async (ctx, next) => {
         if (userStrategyStates[userId]) {
           const state = userStrategyStates[userId];
           if (state.phase === 'tradeSettings') {
+            // Only collect buy amount (SOL) and sell percent (first target).
             const tradeFields = [
-              { key: 'buyAmount', label: 'Buy amount per trade (SOL)', type: 'number' },
-              { key: 'sellPercent1', label: 'Sell percent for first target (%)', type: 'number' },
-              { key: 'target1', label: 'Profit target 1 (%)', type: 'number' },
-              { key: 'sellPercent2', label: 'Sell percent for second target (%)', type: 'number' },
-              { key: 'target2', label: 'Profit target 2 (%)', type: 'number' },
-              { key: 'stopLoss', label: 'Stop loss (%)', type: 'number' },
-              { key: 'maxTrades', label: 'Max concurrent trades', type: 'number' }
-            ];
+                { key: 'buyAmount', label: 'Buy amount per trade (SOL)', type: 'number' },
+                { key: 'sellPercent1', label: 'Sell percent for first target (%)', type: 'number' }
+              ];
             if (state.step >= tradeFields.length) {
               delete userStrategyStates[userId];
               return;
@@ -1918,7 +1923,7 @@ bot.action(/showtoken_buy_(.+)/, async (ctx) => {
       let mergedOk = false;
       // first, check in-memory notification queue where listener may have placed the token payload
       try{
-        const q = (global.__inMemoryNotifQueues && global.__inMemoryNotifQueues.get(String(userId))) || [];
+        const q = ((global as any).__inMemoryNotifQueues && (global as any).__inMemoryNotifQueues.get(String(userId))) || [];
         if(Array.isArray(q) && q.length>0){
           for(const payload of q){
             try{

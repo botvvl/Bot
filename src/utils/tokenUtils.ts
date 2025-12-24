@@ -136,12 +136,9 @@ export async function fetchSolanaFromCoinGecko(): Promise<any> {
  * Users can only set these fields in their strategy.
  */
 export type StrategyField = { key: string; label: string; type: string; optional: boolean; tokenField?: string };
-export let STRATEGY_FIELDS: StrategyField[] = [
-  { key: 'minMarketCap', label: 'Minimum Market Cap (USD)', type: 'number', optional: false, tokenField: 'marketCap' },
-  { key: 'minLiquidity', label: 'Minimum Liquidity (USD)', type: 'number', optional: false, tokenField: 'liquidity' },
-  { key: 'minVolume', label: 'Minimum Volume (24h USD)', type: 'number', optional: false, tokenField: 'volume' },
-  { key: 'minAge', label: 'Minimum Age (minutes)', type: 'number', optional: false, tokenField: 'age' }
-];
+// For this deployment we only collect trade settings (buy/sell amounts) via the strategy flow.
+// Keep STRATEGY_FIELDS empty so the interactive flow jumps directly to trade settings.
+export let STRATEGY_FIELDS: StrategyField[] = [];
 
 
 // ========== DexScreener API Integration ==========

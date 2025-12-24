@@ -64,7 +64,7 @@ export async function transactionSenderAndConfirmationWaiter({
       const prefer = process.env.HIGH_PRIORITY_RPC_URL || process.env.HELIUS_FAST_RPC_URL_2 || (rpcPool.getHealthyCandidates && rpcPool.getHealthyCandidates()[0]);
       if (prefer) {
         try {
-          const fastConn = rpcPool.getRpcConnection(prefer);
+          const fastConn = rpcPool.getRpcConnection({ preferUrl: prefer } as any);
           txid = await fastConn.sendRawTransaction(serializedTransaction, options);
           connection = fastConn; // switch to fast connection for confirmation
         } catch (fastErr) {
@@ -154,7 +154,7 @@ export async function transactionSenderAndConfirmationWaiter({
         try {
           if (!url) continue;
           console.log(`[transactionSenderAndConfirmationWaiter] trying RPC from pool: ${url}`);
-          const altConn = rpcPool.getRpcConnection(url);
+          const altConn = rpcPool.getRpcConnection({ preferUrl: url } as any);
           try {
             txid = await altConn.sendRawTransaction(serializedTransaction, options);
           } catch (sendErr) {
@@ -316,7 +316,7 @@ export async function manualSendRawTransactionVerbose({ connection, serializedTr
       const prefer = process.env.HIGH_PRIORITY_RPC_URL || process.env.HELIUS_FAST_RPC_URL_2 || (rpcPool.getHealthyCandidates && rpcPool.getHealthyCandidates()[0]);
       if (prefer) {
         try {
-          const fastConn = rpcPool.getRpcConnection(prefer);
+          const fastConn = rpcPool.getRpcConnection({ preferUrl: prefer } as any);
           const txid = await fastConn.sendRawTransaction(serializedTransaction, options);
           console.log('[manualSendRawTransactionVerbose] sent via fastConn:', prefer, txid);
           connection = fastConn;
